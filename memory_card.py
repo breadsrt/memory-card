@@ -1,6 +1,6 @@
 import random
 
-from PyQt5.QtWidgets import *
+from PyQt6.QtWidgets import *
 
 import database
 import menu
@@ -21,6 +21,7 @@ answer_btn = QPushButton("Відповісти")
 next_quest_btn = QPushButton("Наступне запитання")
 res_lbl = QLabel("Результат")
 edit_btn = QPushButton("Редагувати запитання")
+add_question_btn = QPushButton("Додати нове запитання")
 group = QGroupBox("Варіанти відповідей")
 
 main_line = QVBoxLayout()
@@ -45,6 +46,7 @@ main_line.addWidget(group)
 main_line.addWidget(answer_btn)
 main_line.addWidget(next_quest_btn)
 main_line.addWidget(edit_btn)
+main_line.addWidget(add_question_btn)
 
 answers = [var1_btn, var2_btn, var3_btn, var4_btn]
 
@@ -56,7 +58,7 @@ def set_quest():
         return
 
     if database.nomer >= len(database.questions):
-        database.nomer = len(database.questions) - 1
+        database.nomer = 0
 
     random.shuffle(answers)
     current_question = database.questions[database.nomer]
@@ -104,6 +106,58 @@ def edit_quest_func():
     edit_menu_module.edit_menu()  # Open the new edit menu
     set_quest()
 
+def open_add_question_dialog():
+    dialog = QDialog()
+    dialog.setWindowTitle("Додати нове запитання")
+    dialog_layout = QVBoxLayout()
+
+    new_quest_lbl = QLabel("Запитання")
+    new_quest_ledt = QLineEdit()
+
+    new_right_lbl = QLabel("Правильна відповіль")
+    new_right_ledt = QLineEdit()
+
+    new_wrong1_lbl = QLabel("Не правильна відповіль1")
+    new_wrong1_ledt = QLineEdit()
+
+    new_wrong2_lbl = QLabel("Не правильна відповіль2")
+    new_wrong2_ledt = QLineEdit()
+
+    new_wrong3_lbl = QLabel("Не правильна відповіль3")
+    new_wrong3_ledt = QLineEdit()
+
+    save_btn = QPushButton("Зберегти")
+
+    dialog_layout.addWidget(new_quest_lbl)
+    dialog_layout.addWidget(new_quest_ledt)
+    dialog_layout.addWidget(new_right_lbl)
+    dialog_layout.addWidget(new_right_ledt)
+    dialog_layout.addWidget(new_wrong1_lbl)
+    dialog_layout.addWidget(new_wrong1_ledt)
+    dialog_layout.addWidget(new_wrong2_lbl)
+    dialog_layout.addWidget(new_wrong2_ledt)
+    dialog_layout.addWidget(new_wrong3_lbl)
+    dialog_layout.addWidget(new_wrong3_ledt)
+    dialog_layout.addWidget(save_btn)
+
+    dialog.setLayout(dialog_layout)
+
+    def save_new_question():
+        new_question = {
+            "запитання": new_quest_ledt.text(),
+            "Правильна відповідь": new_right_ledt.text(),
+            "Не правильна відповідь1": new_wrong1_ledt.text(),
+            "Не правильна відповідь2": new_wrong2_ledt.text(),
+            "Не правильна відповідь3": new_wrong3_ledt.text(),
+        }
+        database.questions.append(new_question)
+        dialog.accept()
+        set_quest()
+
+    save_btn.clicked.connect(save_new_question)
+    dialog.exec()
+
+add_question_btn.clicked.connect(open_add_question_dialog)
 next_quest_btn.clicked.connect(next_quest_func)
 answer_btn.clicked.connect(ans_func)
 menu_btn.clicked.connect(menu.menu)
